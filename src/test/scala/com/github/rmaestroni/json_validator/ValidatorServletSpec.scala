@@ -14,18 +14,12 @@ class ValidatorServletSpec extends ScalatraSpec {
 
   describe("GET /schema/:id") {
     describe("when not found") {
-      val dao = new SchemaDao {
-        override def read(id: String): Try[Reader] = Failure(new FileNotFoundException())
+      addServlet(stubServlet(SchemaFSDao("/tmp/foo")), "/*")
 
-        override def find(id: String): Try[SchemaValidator] = ???
-        override def save(id: String, schema: JsonNode): Try[Unit] = ???
-      }
-    }
-    addServlet(stubServlet(SchemaFSDao("/tmp/foo")), "/*")
-
-    it("returns the schema with the provided id") {
-      get("/schema/xyz") {
-        assertResult(404)(status)
+      it("returns 404") {
+        get("/schema/xyz") {
+          assertResult(404)(status)
+        }
       }
     }
   }

@@ -1,6 +1,7 @@
 package com.github.rmaestroni.json_validator
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.fge.jsonschema.core.report.ProcessingMessage
 import com.github.rmaestroni.json_validator.dao.{SchemaDao, SchemaFSDao}
 import com.github.rmaestroni.json_validator.model.ApiResponse
 import org.json4s.{DefaultFormats, Formats}
@@ -50,6 +51,30 @@ class ValidatorServlet extends ScalatraServlet with JacksonJsonSupport {
         // failed to parse JSON
         status = 422
         ApiResponse.uploadSchema(id, "Invalid JSON")
+      }
+    }
+  }
+
+  post("/validate/:schemaId") {
+    val schemaId = params("schemaId")
+    schemaDao.find(schemaId) match {
+      case Success(validator) => {
+        postBody match {
+          case Success(jsonNode) => {
+            val report = validator.validate(jsonNode)
+            status = if (report.isSuccess) 200 else 422
+            ApiResponse.validateDocument(schemaId, report)
+          }
+          case Failure(exception) => {
+            // failed to parse JSON
+            status = 422
+            ApiResponse.validateDocument(schemaId, "Invalid JSON")
+          }
+        }
+      }
+      case Failure(exception) => {
+        status = 404
+        ApiResponse.validateDocument(schemaId, "Schema not found")
       }
     }
   }
