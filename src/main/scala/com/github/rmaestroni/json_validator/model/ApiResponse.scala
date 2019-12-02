@@ -11,6 +11,10 @@ case class ApiResponse(
                       )
 
 object ApiResponse {
+  def getSchemaNotFound(id: String): ApiResponse = {
+    build(id, "getSchema", Option("Not found"))
+  }
+
   def uploadSchema(id: String, errorMessage: String): ApiResponse = uploadSchema(id, Option(errorMessage))
 
   def uploadSchema(id: String, errorMessage: Option[String] = None): ApiResponse = {

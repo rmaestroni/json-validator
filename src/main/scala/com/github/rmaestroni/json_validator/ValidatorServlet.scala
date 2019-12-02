@@ -16,7 +16,9 @@ class ValidatorServlet extends ScalatraServlet with JacksonJsonSupport {
   before() { contentType = formats("json") }
 
   get("/schema/:id") {
-    schemaDao.read(params("id")) match {
+    val id = params("id")
+
+    schemaDao.read(id) match {
       case Success(reader) =>
         response.setStatus(200)
         response.setCharacterEncoding("UTF-8")
@@ -26,7 +28,9 @@ class ValidatorServlet extends ScalatraServlet with JacksonJsonSupport {
 
         reader.close()
         response.flushBuffer()
-      case Failure(_) => response.sendError(404)
+      case Failure(_) =>
+        status = 404
+        ApiResponse.getSchemaNotFound(id)
     }
   }
 

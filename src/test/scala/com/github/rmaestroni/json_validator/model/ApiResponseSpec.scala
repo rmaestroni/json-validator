@@ -7,6 +7,16 @@ import com.github.fge.jsonschema.core.report.{AbstractProcessingReport, LogLevel
 import collection.JavaConverters._
 
 class ApiResponseSpec extends FunSpec {
+  describe("getSchemaNotFound") {
+    it("returns a failure") {
+      val resp = ApiResponse.getSchemaNotFound("some-id")
+      assertResult("getSchema")(resp.action)
+      assertResult("some-id")(resp.id)
+      assertResult("error")(resp.status)
+      assertResult("Not found")(resp.message.get)
+    }
+  }
+
   describe("uploadSchema") {
     describe("with a blank error message") {
       it("returns a success") {
