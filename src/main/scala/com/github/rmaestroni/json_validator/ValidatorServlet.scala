@@ -1,7 +1,6 @@
 package com.github.rmaestroni.json_validator
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.github.fge.jsonschema.core.report.ProcessingMessage
 import com.github.rmaestroni.json_validator.dao.{SchemaDao, SchemaFSDao}
 import com.github.rmaestroni.json_validator.model.ApiResponse
 import org.json4s.{DefaultFormats, Formats}
@@ -18,68 +17,57 @@ class ValidatorServlet extends ScalatraServlet with JacksonJsonSupport {
 
   get("/schema/:id") {
     schemaDao.read(params("id")) match {
-      case Success(reader) => {
+      case Success(reader) =>
         response.setStatus(200)
         response.setCharacterEncoding("UTF-8")
         response.setContentType("application/json")
 
         reader.transferTo(response.getWriter)
 
-        reader.close
-        response.flushBuffer
-      }
-      case Failure(exception) => response.sendError(404)
+        reader.close()
+        response.flushBuffer()
+      case Failure(_) => response.sendError(404)
     }
   }
 
   post("/schema/:id") {
     val id = params("id")
     postBody match {
-      case Success(jsonNode) => {
+      case Success(jsonNode) =>
         schemaDao.save(id, jsonNode) match {
-          case Success(unit) => {
+          case Success(_) =>
             status = 201
             ApiResponse.uploadSchema(id)
-          }
-          case Failure(exception) => {
+          case Failure(exception) =>
             status = 500
             ApiResponse.uploadSchema(id, exception.getMessage)
-          }
         }
-      }
-      case Failure(exception) => {
+      case Failure(_) =>
         // failed to parse JSON
         status = 422
         ApiResponse.uploadSchema(id, "Invalid JSON")
-      }
     }
   }
 
   post("/validate/:schemaId") {
     val schemaId = params("schemaId")
     schemaDao.find(schemaId) match {
-      case Success(validator) => {
+      case Success(validator) =>
         postBody match {
-          case Success(jsonNode) => {
+          case Success(jsonNode) =>
             val report = validator.validate(jsonNode)
             status = if (report.isSuccess) 200 else 422
             ApiResponse.validateDocument(schemaId, report)
-          }
-          case Failure(exception) => {
+          case Failure(_) =>
             // failed to parse JSON
             status = 422
             ApiResponse.validateDocument(schemaId, "Invalid JSON")
-          }
         }
-      }
-      case Failure(exception) => {
+      case Failure(_) =>
         status = 404
         ApiResponse.validateDocument(schemaId, "Schema not found")
-      }
     }
   }
 
-  private def postBody: Try[JsonNode] = Try(parse(request.getReader)).map(asJsonNode(_))
+  private def postBody: Try[JsonNode] = Try(parse(request.getReader)).map(asJsonNode)
 }
-
-import scala.util.{Failure, Success, Try}

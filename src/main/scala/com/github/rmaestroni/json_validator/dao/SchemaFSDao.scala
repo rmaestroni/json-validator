@@ -12,7 +12,7 @@ class SchemaFSDao(val containerDir: Path) extends SchemaDao {
 
   override def find(id: String): Try[SchemaValidator] = {
     read(id)
-      .map(mapper.readTree(_))
+      .map(mapper.readTree)
       .map(SchemaValidator(_))
   }
 
