@@ -11,7 +11,7 @@ import scala.util.{Failure, Success, Try}
 
 class ValidatorServlet extends ScalatraServlet with JacksonJsonSupport {
   protected implicit lazy val jsonFormats: Formats = DefaultFormats
-  protected val schemaDao: SchemaDao = SchemaFSDao("/tmp/snowplow")
+  protected val schemaDao: SchemaDao = SchemaFSDao(System.getenv("SCHEMA_DIR"))
 
   before() { contentType = formats("json") }
 

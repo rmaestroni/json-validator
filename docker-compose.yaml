@@ -3,12 +3,11 @@ version: '3'
 services:
 
   json-validator:
-    build:
-      context: ./
-      dockerfile: Dockerfile.dev
+    build: ./
 
     environment:
       PORT: 8080
+      SCHEMA_DIR: /tmp/snowplow
 
     ports:
-      - 8080:8080
+      - 8090:8080

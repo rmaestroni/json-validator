@@ -1,7 +1,7 @@
-FROM bigtruedata/scala:2.12 AS sbt-build
+FROM openjdk:12 AS sbt-build
 
 # install sbt
-RUN wget -O- 'https://github.com/sbt/sbt/releases/download/v1.3.3/sbt-1.3.3.tgz' | \
+RUN curl -L 'https://github.com/sbt/sbt/releases/download/v1.3.3/sbt-1.3.3.tgz' | \
     tar xzf - -C /usr/local --strip-components=1 && sbt exit
 
 WORKDIR /app
@@ -15,19 +15,19 @@ COPY src src
 
 RUN sbt compile && \
   sbt test && \
-  sbt universal:packageBin && \
-  mv "target/universal/json-validator-$(sbt -no-colors version | tail -1 | cut -d ' ' -f 2).zip" /app.zip
+  sbt universal:packageZipTarball && \
+  mv "target/universal/json-validator-$(sbt -no-colors version | tail -1 | cut -d ' ' -f 2).tgz" /app.tgz
 
 # end of build stage
 
-FROM openjdk:8
+FROM openjdk:12
 
 WORKDIR /app
 
 ENV JAVA_OPTS="-Xmx512m"
 
-COPY --from=sbt-build /app.zip .
-RUN unzip app.zip
+COPY --from=sbt-build /app.tgz .
+RUN tar xzpf app.tgz
 
 COPY entrypoint.sh ./
 RUN chmod u+x entrypoint.sh bin/json-validator
