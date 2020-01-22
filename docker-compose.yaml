@@ -4,10 +4,10 @@ services:
 
   json-validator:
     build: ./
-
     environment:
       PORT: 8080
-      SCHEMA_DIR: /tmp/snowplow
-
+      SCHEMA_DIR: /schemas
+    volumes:
+      - ./tmp/schemas:/schemas
     ports:
-      - 8090:8080
+      - 8080:8080

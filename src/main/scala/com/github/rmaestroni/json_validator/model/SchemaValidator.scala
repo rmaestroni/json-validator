@@ -19,9 +19,7 @@ class SchemaValidator(val schemaDoc: JsonNode) {
     }
   }
 
-  def validate(document: JsonNode): ProcessingReport = {
-    schema.validate(document)
-  }
+  def validate(document: JsonNode): ProcessingReport = schema.validate(document)
 }
 
 object SchemaValidator {
