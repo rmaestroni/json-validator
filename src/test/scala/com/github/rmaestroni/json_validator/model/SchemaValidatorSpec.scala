@@ -34,5 +34,15 @@ class SchemaValidatorSpec extends FunSpec {
         assert(report.isSuccess)
       }
     }
+
+    describe("when json doc contains null keys") {
+      it("removes the keys before validating") {
+        val reportOk = validator.validate(""" { "source": "foo", "destination": "bar", "some-null-key": null } """)
+        assert(reportOk.isSuccess)
+
+        val reportFailure = validator.validate(""" { "source": "foo", "destination": null } """)
+        assert(!reportFailure.isSuccess)
+      }
+    }
   }
 }

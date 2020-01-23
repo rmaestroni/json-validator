@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.github.fge.jsonschema.core.report.ProcessingReport
 import com.github.fge.jsonschema.main.JsonSchemaFactory
+import com.github.rmaestroni.json_validator.json_util.RemoveNullKeys
 
 class SchemaValidator(val schemaDoc: JsonNode) {
   private val mapper = new ObjectMapper()
@@ -19,7 +20,7 @@ class SchemaValidator(val schemaDoc: JsonNode) {
     }
   }
 
-  def validate(document: JsonNode): ProcessingReport = schema.validate(document)
+  def validate(document: JsonNode): ProcessingReport = schema.validate(RemoveNullKeys(document))
 }
 
 object SchemaValidator {

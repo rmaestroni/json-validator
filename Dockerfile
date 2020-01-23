@@ -13,9 +13,7 @@ RUN sbt update
 
 COPY src src
 
-RUN sbt compile && \
-  sbt test && \
-  sbt universal:packageZipTarball
+RUN sbt compile && sbt test && sbt universal:packageZipTarball
 RUN mv "target/universal/json-validator-$(sbt -no-colors version | tail -1 | cut -d ' ' -f 2).tgz" app.tgz
 
 # end of build stage
