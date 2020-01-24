@@ -1,12 +1,30 @@
-# JSON validator #
+# JSON validator
 
-## Build & Run ##
+## Build and run
 
 ```sh
-$ cd json-validator
-$ sbt
-> jetty:start
-> browse
+docker-compose up
 ```
 
-If `browse` doesn't launch your browser, manually open [http://localhost:8080/](http://localhost:8080/) in your browser.
+Alternatively
+```sh
+docker build -t json-validator . && \
+  docker run -e PORT=8080 -e SCHEMA_DIR=/schemas \
+    -v "$(pwd)/tmp/schemas:/schemas" \
+    -p 8080:8080 \
+    json-validator
+```
+
+Both commands will run the service saving the schemas to the local directory
+`./tmp/schemas`.
+
+Without Docker, use `PORT=8080 SCHEMA_DIR=tmp/schemas sbt` then `jetty:start`.
+
+## Endpoints
+
+```
+POST    /schema/SCHEMAID        - Upload a JSON Schema with unique `SCHEMAID`
+GET     /schema/SCHEMAID        - Download a JSON Schema with unique `SCHEMAID`
+
+POST    /validate/SCHEMAID      - Validate a JSON document against the JSON Schema identified by `SCHEMAID`
+```
