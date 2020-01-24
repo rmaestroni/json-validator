@@ -12,19 +12,17 @@ class RemoveNullKeys extends (JsonNode => JsonNode) {
 
   override def apply(node: JsonNode): JsonNode = clone(node)
 
-  private def clone(node: JsonNode): JsonNode = {
-    if (node.isObject) {
+  private def clone(root: JsonNode): JsonNode = root match {
+    case node if node.isObject =>
       node
         .fields().asScala
         .foldLeft(mapper.createObjectNode())(copyFields)
-    } else if (node.isArray) {
+    case node if node.isArray =>
       node
         .elements().asScala
         .map(element => clone(element))
         .foldLeft(mapper.createArrayNode())((ary, element) => ary.add(element))
-    } else {
-      node.deepCopy() // node is a value (number, string, ...)
-    }
+    case node => node.deepCopy()
   }
 
   private def copyFields(receiver: ObjectNode, entry: Entry[String, JsonNode]): ObjectNode = {
